@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  image_sorter_for_lora:
+    build: ./docker/main/
+    volumes:
+      - .:/app
+      - ./vim:/root/.vim
+      - ./vimrc:/root/.vimrc
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - WAYLAND_DISPLAY=$WAYLAND_DISPLAY
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+      - PULSE_SERVER=$PULSE_SERVER
+      - QT_X11_NO_MITSHM 1
+      - NO_AT_BRIDGE 1
+      - DISPLAY=:1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    network_mode: host
+    tty: true
+    privileged: true
+    stdin_open: true
+    image: image_sorter_for_lora:latest
+    command: bash -c '/etc/init.d/dbus start && tail -F /dev/null'

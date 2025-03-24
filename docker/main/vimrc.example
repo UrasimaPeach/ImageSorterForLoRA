@@ -1,0 +1,28 @@
+call plug#begin()
+Plug 'scrooloose/syntastic'
+Plug 'pmsorhaindo/syntastic-local-eslint.vim'
+Plug 'kannokanno/previm'
+Plug 'tyru/open-browser.vim'
+Plug 'leafgarland/typescript-vim'
+Plug 'editorconfig/editorconfig-vim'
+let g:syntastic_javascript_checkers=['eslint']
+let g:syntastic_python_checkers = ["flake8"]
+let g:syntastic_php_checkers = ['phpcs']
+call plug#end()
+"Plugによって自動でOnになるものをoffにする
+filetype indent off   " Disable file-type-specific indentation
+syntax off            " Disable syntax highlighting
+"Plugここまで
+
+set number "行番号表示
+set title "編集中のファイル名表示
+set showmatch "対応する括弧の表示
+syntax on "色をつける
+set nowrapscan "検索時のループをしない
+set wrap "長い行が折り返し表示される
+set whichwrap=<>[] "文末尾にて左右キーでカーソル上下移動が可能になるようにする。
+set clipboard=unnamed,unnamedplus "GUIとクリップボード共有(ただし効果がないことは多い)
+set directory=~/.vim/tmp "swapを間違ってpushしたりしないようテンポラリに隔離
+set backupdir=~/.vim/tmp "swapを間違ってpushしたりしないようにテンポラリに隔離
+set viminfo='20,\"1000 "コピペの行数上限は多ければ多いほどいいのでとりあえず1000行
+au BufRead,BufNewFile *.md set filetype=markdown
