@@ -1,4 +1,4 @@
 vim
 vimrc
-./image-sorter-for-lora/testdata/*
-./image-sorter-for-lora/node_modules/*
+image-sorter-for-lora/testdata/*
+image-sorter-for-lora/node_modules/*
