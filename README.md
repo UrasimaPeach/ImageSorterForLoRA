@@ -93,6 +93,7 @@ yarn licenses generate-disclaimer > public/THIRD_PARTY_LICENSES.txt
 #### Electron製のアプリの動作確認
 
 動作確認のコンテナ内にはフォントがないので、日本語を含むデータを確認したい場合はビルドを行ってください。
+また、これを実行する前にUbuntu側で`xhost +local:`を実行して下さい。
 
 ```
 npm run start

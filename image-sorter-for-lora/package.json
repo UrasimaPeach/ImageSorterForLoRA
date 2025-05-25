@@ -1,6 +1,7 @@
 {
   "name": "etn",
   "version": "1.0.0",
+  "workspaces": ["./"],
   "main": "main.js",
   "scripts": {
     "start": "electron . --no-sandbox",

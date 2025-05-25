@@ -1,0 +1,18 @@
+body {
+  display: flex;
+}
+.ictd-space {
+  flex: 1;
+  border: #cfcfcf solid 1px;
+  height: 100vh;
+}
+
+.main-space {
+  flex: 2;
+}
+.image-space {
+  flex: 3;
+}
+#checkingImageTags {
+  width: 100%;
+}

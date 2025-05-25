@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self';
+        img-src 'self' data: ;"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <link href="styles/index.css" rel="stylesheet" />
+    <title>ImageSorterForLoRA</title>
+  </head>
+  <body>
+    <div class="ictd-space">
+      <h2>Image copy target directory</h2>
+      <button id="btnAddCopyTarget">add copy target directory</button>
+      <div id="copyTargetSpace"><p>select copy target directory</p></div>
+    </div>
+    <div class="main-space">
+      <h1>ImageSorterForLoRA</h1>
+      <p>
+        <button id="btnDirectorySelect">select generated images directory</button>
+      </p>
+      <h2>CheckingImage</h2>
+      <p>now image index: <input id="checkingImageIndex" type="number" /></p>
+      <p>now image tags text</p>
+      <textarea id="checkingImageTags" rows="5"></textarea>
+      <p>now directory: <span id="showDirectorySelect"></span></p>
+      <p>now image name: <span id="showCurrentImageName"></span></p>
+      <p>last image index(fist image index is 0): <span id="lastImageIndex"></span></p>
+    </div>
+    <div class="image-space">
+      <div id="showCurrentImage"></div>
+    </div>
+  </body>
+  <script src="./renderer.js"></script>
+</html>
