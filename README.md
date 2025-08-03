@@ -85,7 +85,7 @@ vim src/example.tsx
 #### 依存ライブラリのライセンスを出力する
 
 ```
-cd urasima-peach-girhub-page
+cd ImageSorterForLoRA
 npm install -g yarn # 基本的にnpmを使う想定のコンテナだが、ライセンスを出力するために一時的にyarnをコンテナにインストール
 yarn licenses generate-disclaimer > public/THIRD_PARTY_LICENSES.txt
 ```

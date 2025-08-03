@@ -154,3 +154,43 @@ export const positiveTagsToString = (positiveTags, removeTags) => {
   const result = filteredPositiveTags.join(",\n");
   return result
 }
+
+export const tagListToTagListString = (tagList) => {
+  return tagList.join(",")
+}
+
+export const tagListStringToTagList = (tagListString) => {
+  const separatorRegexAfter = /,[ ]+/g
+  const separatorRegexBefore = /[ ]+,/g
+  const escapedString = tagListString.replaceAll("\n","").replaceAll(separatorRegexAfter, ",").replaceAll(separatorRegexBefore, ",")
+  return tagListString.split(",")
+}
+
+export const removeTagList = (tagList, removeTagList) => {
+  /*
+    tagListとremoveTagListはstring型の配列を想定。
+    重複排除し、ソートする。
+  */
+  const sortedTagList = Array.from(new Set(tagList)).sort();
+  const sortedRemoveTagList = Array.from(new Set(removeTagList)).sort();
+  const result = []
+  /*
+    配列はソート済みなので、一度比較したら再び比較する必要はないので、二重ループの中でイテレータはリセットされない。
+    (これで計算量がsortedTagList.length * sortedRemoveTagList.lengthからsortedTagList.length + sortedRemoveTagListになる)
+  */
+  let tagListIndex = 0;
+  let removeTagListIndex = 0;
+  for(tagListIndex=0;tagListIndex<sortedTagList.length;tagListIndex++) {
+    let thisTagIsResult = true;
+    while(removeTagListIndex<sortedRemoveTagList.length && sortedRemoveTagList[removeTagListIndex]<=sortedTagList[tagListIndex]) {
+      if(sortedRemoveTagList[removeTagListIndex] === sortedTagList[tagListIndex]) {
+        thisTagIsResult = false;
+      }
+      removeTagListIndex++;
+    }
+    if(thisTagIsResult) {
+      result.push(sortedTagList[tagListIndex])
+    }
+  }
+  return result
+}

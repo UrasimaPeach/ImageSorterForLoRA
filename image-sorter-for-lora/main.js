@@ -1,7 +1,14 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
-const { bufferToPngInfo, pngInfoToPositiveTags, positiveTagsToString } = require('./util/readpng')
+const {
+  bufferToPngInfo,
+  pngInfoToPositiveTags,
+  positiveTagsToString,
+  tagListToTagListString,
+  tagListStringToTagList,
+  removeTagList
+} = require('./util/readpng')
 const { escapeToHtmlText } = require('./util/escape')
 const { base64ImgSrc } = require('./util/imageSrc')
 
@@ -67,7 +74,9 @@ const createWindow = () => {
     targetSpaceList.forEach((_value, index) => {
       executeScript = `${executeScript}
         document.getElementById('copyToHereButton${index}').addEventListener('click', async() => {
-          await window.apis.runClickEventCopyToHere(${index});
+          const imageTagsString = document.getElementById('checkingImageTags').value;
+          const removeTagsString = document.getElementById('removeImageTags').value;
+          await window.apis.runClickEventCopyToHere(${index}, imageTagsString, removeTagsString);
         })
         document.getElementById('removeThisAreaButton${index}').addEventListener('click', async() => {
           await window.apis.runClickRemoveThisArea(${index});
@@ -114,8 +123,23 @@ const createWindow = () => {
       }
     });
   });
-  ipcMain.handle('click-event-cth', async (_e, arg) => {
-    console.log(arg)
+  ipcMain.handle('click-event-cth', async (
+    _e,
+    targetDirectoryIndex,
+    imageTagsString,
+    removeTagsString
+  ) => {
+    const selectionImage = undeterminedImages[selectionIndexOfUI];
+    const targetDirectoryPath = targetSpaceList[targetDirectoryIndex];
+    const targetImageFilePath = path.join(targetDirectoryPath, selectionImage.fileName);
+    const targetTagTextPath = `${targetImageFilePath.substring(0, targetImageFilePath.lastIndexOf("."))}.txt`;
+    fs.copyFileSync(selectionImage.filePath, targetImageFilePath);
+    const imageTags = tagListStringToTagList(imageTagsString);
+    const removeTags = tagListStringToTagList(removeTagsString);
+    const resultTags = removeTagList(imageTags, removeTags)
+    const tagText = tagListToTagListString(resultTags);
+    fs.writeFileSync(targetTagTextPath, tagText, { encoding: "utf8"});
+    setSelectionIndexOfUI(selectionIndexOfUI+1);
   })
   ipcMain.handle('click-event-rta', async (_e, index) => {
     targetSpaceList.splice(index, 1)
