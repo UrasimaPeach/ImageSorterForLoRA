@@ -1,9 +1,11 @@
-# 開発環境テンプレート
+# ImageSorterForLoRA
 
-概要
+StableDuffusion WebUI(AUTOMATIC1111)を用いて自動生成した画像ファイルが格納されたフォルダを対象に、LoRA用の画像として人間の手で破綻していない画像のみを指定のディレクトリのコピー(仕分け)するためのプログラムです。
+タグ用のテキストファイルはコピーボタンを押した時に、png内に自動で書き込まれるプロンプトから生成します。
 
 # 使用方法
 
+[TODO]
 
 # 以下技術者(開発者)向け
 
@@ -13,10 +15,14 @@ docker, sh
 
 ## 開発環境
 
-このプロダクトではdockerを使って開発と動作確認が行われます。
+このプロダクトではUbuntu上でdockerを使って開発と動作確認が行われる想定でREADME.mdを記載しています。
 リポジトリのルートディレクトリは開発環境内でマウントしているので、root権限で実行すれば通常通りソースコードの編集などの作業が可能です。
 devContainer等使うほうが行儀がいいと思いますが、管理人はVSCodeよりもvimを使いたいので開発環境内コマンドでvimを使って開発を進めています。
 VSCodeを使いたい人はRemote Desktopなどを使うと良いでしょう。(その場合は追加のymlファイルなどPRくださればレビューします。)
+
+### DockerではなくWSLを使いたい場合
+
+WSL上で、`docker/main/Dockerfile`の内容相当のコマンドを実行してください。
 
 ## 実行方法
 
@@ -33,7 +39,7 @@ VSCodeを使いたい人はRemote Desktopなどを使うと良いでしょう。
 以下のコマンドでコンテナを立ち上げることで実行環境が出来上がります。
 
 ```
-docker compoose build
+docker compose build
 ```
 
 ### コンテナの実行
@@ -90,28 +96,26 @@ npm install -g yarn # 基本的にnpmを使う想定のコンテナだが、ラ�
 yarn licenses generate-disclaimer > public/THIRD_PARTY_LICENSES.txt
 ```
 
-#### Electron製のアプリの動作確認
+#### 動作確認
 
-動作確認のコンテナ内にはフォントがないので、日本語を含むデータを確認したい場合はビルドを行ってください。
-また、これを実行する前にUbuntu側で`xhost +local:`を実行して下さい。
+動作確認のコンテナ内にはフォントがないので、日本語を含むデータを使って動作を確認したい場合はmakeを行ってください。
+また、Ubuntu上でこれを実行する場合、実行する前にUbuntu側で`xhost +local:`を実行して下さい。
+(WSL上ではnpm installしたらそのまま以下のコマンドを実行してください。)
 
 ```
 npm run start
 ```
 
-#### Electron製アプリをmakeして実行ファイルを出力する
+#### アプリをmakeして実行ファイルを出力する
+
+Windows上では、以下のコマンドを実行したあと生成される`image-sorter-for-lora/out/make/squirrel.windows/x64/*.exe`を使用する。
+Linux上では、以下のコマンドを実行したあと生成される`image-soter-for-lora/out/make/dev/x64/*.deb`をインストールする。
 
 ```
 npm run make
 ```
 
-#### Electron製アプリをpackageして配布形式にする
-
-```
-npm run package
-```
-
-# LISCENCE
+# LICENSE
 
 MIT License
 

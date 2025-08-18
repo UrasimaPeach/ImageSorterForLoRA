@@ -1,6 +1,6 @@
 {
-  "name": "etn",
-  "version": "1.0.0",
+  "name": "ImageSorterForLoRA",
+  "version": "0.0.0",
   "workspaces": ["./"],
   "main": "main.js",
   "scripts": {
@@ -11,9 +11,9 @@
     "make-windows": "electron-forge make --platform win32 --arch x64",
     "make": "npm run make-linux && npm run make-windows"
   },
-  "author": "",
+  "author": "UrasimaPeach",
   "license": "MIT",
-  "description": "electron hello world",
+  "description": "Image sorter tool for manual selecting by human",
   "devDependencies": {
     "@electron-forge/cli": "^7.7.0",
     "@electron-forge/maker-deb": "^7.7.0",
