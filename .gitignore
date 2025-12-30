@@ -1,5 +1,7 @@
 vim
 vimrc
+.env
+.build_env
 image-sorter-for-lora/out/*
 image-sorter-for-lora/testdata/*
 image-sorter-for-lora/node_modules/*
