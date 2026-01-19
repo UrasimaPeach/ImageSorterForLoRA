@@ -65,7 +65,7 @@ docker compose up -d
 ```
 
 最初にコンテナにアクセスした時、コンテナ内でvimの設定ファイルの初期化を行う。
-また、npmの設定もコピーする。
+また、npmのライブラリのインストールも行う。
 
 ```
 chmod 700 ./scripts/init_in_container.sh
@@ -102,6 +102,7 @@ yarn licenses generate-disclaimer > public/THIRD_PARTY_LICENSES.txt
 
 動作確認のコンテナ内にはフォントがないので、日本語を含むデータを使って動作を確認したい場合はmakeを行ってください。
 また、Ubuntu上でこれを実行する場合、実行する前にUbuntu側で`xhost +local:`を実行して下さい。
+動作確認が終わったら、念の為`xhost -`を実行してください。
 (WSL上ではnpm installしたらそのまま以下のコマンドを実行してください。)
 
 ```
