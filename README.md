@@ -43,6 +43,8 @@ VSCodeを使いたい人はRemote Desktopなどを使うと良いでしょう。
 ```
 echo "USERNAME=`whoami`" > ./.build_env;echo "UID=`id -u`" >> ./.build_env;echo "GID=`id -g`" >> ./.build_env
 cat ./.build_env >> .env
+mkdir vim
+cp docker/main/vimrc.example vimrc
 docker compose --env-file ./.build_env build
 ```
 
