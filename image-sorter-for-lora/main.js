@@ -75,8 +75,14 @@ const createWindow = () => {
       executeScript = `${executeScript}
         document.getElementById('copyToHereButton${index}').addEventListener('click', async() => {
           const imageTagsString = document.getElementById('checkingImageTags').value;
-          const removeTagsString = document.getElementById('removeImageTags').value;
-          await window.apis.runClickEventCopyToHere(${index}, imageTagsString, removeTagsString);
+          const removeTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
+          const extraTagsString = document.getElementById('sharedExtraTagsOfImage').value;
+          await window.apis.runClickEventCopyToHere(
+            ${index},
+            imageTagsString,
+            removeTagsString,
+            extraTagsString
+          );
         })
         document.getElementById('removeThisAreaButton${index}').addEventListener('click', async() => {
           await window.apis.runClickRemoveThisArea(${index});
@@ -127,7 +133,8 @@ const createWindow = () => {
     _e,
     targetDirectoryIndex,
     imageTagsString,
-    removeTagsString
+    removeTagsString,
+    extraTagsString
   ) => {
     const selectionImage = undeterminedImages[selectionIndexOfUI];
     const targetDirectoryPath = targetSpaceList[targetDirectoryIndex];
@@ -136,7 +143,9 @@ const createWindow = () => {
     fs.copyFileSync(selectionImage.filePath, targetImageFilePath);
     const imageTags = tagListStringToTagList(imageTagsString);
     const removeTags = tagListStringToTagList(removeTagsString);
-    const resultTags = removeTagList(imageTags, removeTags)
+    const extraTags = tagListStringToTagList(extraTagsString);
+    let resultTags = removeTagList(imageTags, removeTags)
+    resultTags = resultTags.concat(extraTags)
     const tagText = tagListToTagListString(resultTags);
     fs.writeFileSync(targetTagTextPath, tagText, { encoding: "utf8"});
     setSelectionIndexOfUI(selectionIndexOfUI+1);
