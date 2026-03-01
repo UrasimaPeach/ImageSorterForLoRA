@@ -143,8 +143,9 @@ const createWindow = () => {
     fs.copyFileSync(selectionImage.filePath, targetImageFilePath);
     const imageTags = tagListStringToTagList(imageTagsString);
     const removeTags = tagListStringToTagList(removeTagsString);
-    const extraTags = tagListStringToTagList(removeTagsString);
-    const resultTags = removeTagList(imageTags, removeTags)
+    const extraTags = tagListStringToTagList(extraTagsString);
+    let resultTags = removeTagList(imageTags, removeTags)
+    resultTags = resultTags.concat(extraTags)
     const tagText = tagListToTagListString(resultTags);
     fs.writeFileSync(targetTagTextPath, tagText, { encoding: "utf8"});
     setSelectionIndexOfUI(selectionIndexOfUI+1);

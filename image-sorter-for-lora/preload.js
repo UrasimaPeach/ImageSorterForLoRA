@@ -3,7 +3,12 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('apis', {
   runClickEventDirectorySelect: async () => ipcRenderer.invoke('click-event-ds'),
   runClickEventAddCopyTarget: async () => ipcRenderer.invoke('click-event-act'),
-  runClickEventCopyToHere: async (targetDirectoryIndex, imageTagsString, removeTagsString) => {
+  runClickEventCopyToHere: async (
+    targetDirectoryIndex,
+    imageTagsString,
+    removeTagsString,
+    extraTagsString
+  ) => {
 	return ipcRenderer.invoke(
 		'click-event-cth',
 		targetDirectoryIndex,
