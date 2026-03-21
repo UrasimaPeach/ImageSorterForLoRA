@@ -11,6 +11,7 @@ const {
 } = require('./util/readpng')
 const { escapeToHtmlText } = require('./util/escape')
 const { base64ImgSrc } = require('./util/imageSrc')
+const { ensureTargetDirectory } = require('./isfl/editdir')
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -24,6 +25,7 @@ const createWindow = () => {
   let undeterminedDirPath = "";
   let undeterminedImages = [];
   let targetSpaceList = [];
+  let configJson = {};
   const setSelectionIndexOfUI = (indexAny) => {
     const indexInt = parseInt(indexAny)
     if (!isNaN(indexInt)) {
@@ -94,6 +96,7 @@ const createWindow = () => {
     dialog.showOpenDialog({title: '', properties: ['openDirectory', 'showHiddenFiles']}).then(result => {
       if(!result.canceled) {
         undeterminedDirPath = result.filePaths[0];
+        configJson = ensureTargetDirectory(undeterminedDirPath);
         const fileNames = fs.readdirSync(undeterminedDirPath);
         fileNames.sort();
         undeterminedImages = []
@@ -116,7 +119,6 @@ const createWindow = () => {
             }
           }
         })
-        console.log("undeterminedimages", undeterminedImages)
         setSelectionIndexOfUI(0)
       }
     })
