@@ -16,6 +16,9 @@ body {
 #checkingImageTags {
   width: 100%;
 }
-#removeImageTags {
+#sharedRemoveTagsOfImage {
+  width: 100%;
+}
+#sharedExtraTagsOfImage {
   width: 100%;
 }

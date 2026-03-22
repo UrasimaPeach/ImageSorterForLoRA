@@ -23,8 +23,8 @@ export const ensureTargetDirectory = (dirPath) => {
 
 export const generateInitConfig = () => {
   return {
-    commonDeleteTagList: [], // string
-    commonAddTagList: [], // string
+    sharedRemoveTagsList: [], // string
+    sharedExtraTagsList: [], // string
     currentShowingImageIndex: 0, // number
     copyTargetDirectoryAbsolutePathList: [] // number
   }

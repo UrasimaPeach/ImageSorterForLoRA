@@ -11,7 +11,11 @@ const {
 } = require('./util/readpng')
 const { escapeToHtmlText } = require('./util/escape')
 const { base64ImgSrc } = require('./util/imageSrc')
-const { ensureTargetDirectory } = require('./isfl/editdir')
+const {
+  ensureTargetDirectory,
+  generateInitConfig,
+  outputConig
+} = require('./isfl/editdir')
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -25,7 +29,16 @@ const createWindow = () => {
   let undeterminedDirPath = "";
   let undeterminedImages = [];
   let targetSpaceList = [];
-  let configJson = {};
+  let configJson = generateInitConfig();
+  const updateConfigJsonCurrent = () => {
+    console.log("config update on ", undeterminedDirPath)
+    if((!isNaN(undeterminedDirPath)) && undeterminedDirPath.length > 0) {
+      outputConfig(
+        undeterminedDirPath,
+        configJson
+      )
+    }
+  }
   const setSelectionIndexOfUI = (indexAny) => {
     const indexInt = parseInt(indexAny)
     if (!isNaN(indexInt)) {
@@ -158,6 +171,9 @@ const createWindow = () => {
   })
   ipcMain.handle('input-event-cii', async (_e, args) => {
     setSelectionIndexOfUI(args.indexString)
+  })
+  ipcMain.handle('click-event-sit', async (_e, args) => {
+    updateConfigJsonCurrent();
   })
 
   ipcMain.on('close', () => {
