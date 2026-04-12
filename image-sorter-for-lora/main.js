@@ -13,7 +13,7 @@ const { escapeToHtmlText } = require('./util/escape')
 const { base64ImgSrc } = require('./util/imageSrc')
 const {
   ensureTargetDirectory,
-  outputConig
+  outputConfig
 } = require('./isfl/editdir')
 const {
   generateInitStatus
@@ -29,7 +29,13 @@ const createWindow = () => {
   });
   let isflStatus = generateInitStatus();
   const updateConfigJsonCurrent = () => {
-    if((!isNaN(isflStatus.undeterminedDirPath)) && isflStatus.undeterminedDirPath.length > 0) {
+    console.log(isflStatus.undeterminedDirPath)
+    console.log(isflStatus.configJson)
+    if (
+      (isflStatus.undeterminedDirPath != null) &&
+      (!isNaN(isflStatus.undeterminedDirPath.length)) &&
+      isflStatus.undeterminedDirPath.length > 0
+    ) {
       outputConfig(
         isflStatus.undeterminedDirPath,
         isflStatus.configJson
@@ -68,7 +74,6 @@ const createWindow = () => {
   const reloadTargetSpaceList = () => {
     let targetSpaceInnerHtml = `<p>select copy target directory</p>`
     targetSpaceInnerHtml = "";
-    console.log("mike")
     isflStatus.configJson.copyTargetDirectoryResolutionPathList.forEach((targetSpacePath, index) => {
       const escapedPath = escapeToHtmlText(targetSpacePath)
       const targetSpaceButtonAreaHtml = `
@@ -81,11 +86,9 @@ const createWindow = () => {
         </button>`;
       targetSpaceInnerHtml = `${targetSpaceInnerHtml}${targetSpaceButtonAreaHtml}`;
     });
-    console.log("AAWM", targetSpaceInnerHtml)
     let executeScript = `
       document.getElementById('copyTargetSpace').innerHTML=\`${targetSpaceInnerHtml}\`;
     `;
-    console.log("GEKA", executeScript)
     isflStatus.configJson.copyTargetDirectoryResolutionPathList.forEach((_value, index) => {
       executeScript = `${executeScript}
         document.getElementById('copyToHereButton${index}').addEventListener('click', async() => {
@@ -103,7 +106,6 @@ const createWindow = () => {
           await window.apis.runClickRemoveThisArea(${index});
         })`
     })
-    console.log("KEKO", executeScript)
     win.webContents.executeJavaScript(executeScript);
   }
   ipcMain.handle('click-event-ds', async (_e, _arg) => {
@@ -111,6 +113,10 @@ const createWindow = () => {
       if(!result.canceled) {
         isflStatus.undeterminedDirPath = result.filePaths[0];
         isflStatus.configJson = ensureTargetDirectory(isflStatus.undeterminedDirPath);
+        // TODO: reflect remove tag
+        // TODO: reflect extra tag
+        // TODO: reflect index
+        reloadTargetSpaceList();
         const fileNames = fs.readdirSync(isflStatus.undeterminedDirPath);
         fileNames.sort();
         isflStatus.undeterminedImages = []
@@ -140,9 +146,6 @@ const createWindow = () => {
   ipcMain.handle('click-event-act', async (_e, _arg) => {
     dialog.showOpenDialog({title: '', properties: ['openDirectory', 'showHiddenFiles', 'createDirectory']}).then(result => {
       if(!result.canceled) {
-        console.log(JSON.stringify(isflStatus.configJson))
-        console.log(JSON.stringify(isflStatus.configJson["copyTargetDirectoryResolutionPathList"]))
-        console.log(result.filePaths)
         isflStatus.configJson.copyTargetDirectoryResolutionPathList.push(
           result.filePaths[0]
         );
@@ -168,13 +171,32 @@ const createWindow = () => {
     let resultTags = removeTagList(imageTags, removeTags)
     resultTags = resultTags.concat(extraTags)
     const tagText = tagListToTagListString(resultTags);
+    console.log(imageTags)
+    console.log(removeTags)
+    console.log(extraTags)
     fs.writeFileSync(targetTagTextPath, tagText, { encoding: "utf8"});
     setSelectionIndexOfUI(isflStatus.selectionIndexOfUI+1);
+
+    isflStatus.configJson.sharedRemoveTagsList = removeTags
+    isflStatus.configJson.sharedExtraTagsList = extraTags
     updateConfigJsonCurrent();
+  })
+  ipcMain.handle('sync-value-to-status', async (_e, args) => {
+    const removeTagsString = args["removeTagsString"];
+    if(removeTagsString != null) {
+      const extraTags = tagListStringToTagList(extraTagsString);
+      isflStatus.configJson.sharedRemoveTagsList = removeTags;
+    }
+    const extraTagsString = args["extraTagsString"];
+    if(extraTagsString != null) {
+      const removeTags = tagListStringToTagList(removeTagsString);
+      isflStatus.configJson.sharedExtraTagsList = extraTags;
+    }
   })
   ipcMain.handle('click-event-rta', async (_e, index) => {
     isflStatus.configJson.copyTargetDirectoryResolutionPathList.splice(index, 1)
     reloadTargetSpaceList();
+    updateConfigJsonCurrent();
   })
   ipcMain.handle('input-event-cii', async (_e, args) => {
     setSelectionIndexOfUI(args.indexString)
