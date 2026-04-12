@@ -26,7 +26,7 @@ export const generateInitConfig = () => {
     sharedRemoveTagsList: [], // string
     sharedExtraTagsList: [], // string
     currentShowingImageIndex: 0, // number
-    copyTargetDirectoryAbsolutePathList: [] // number
+    copyTargetDirectoryResolutionPathList: [] // string
   }
 }
 
@@ -43,6 +43,11 @@ export const readConfig = (dirPath) => {
     path.join(dirPath, CONFIGFILE_NAME),
     { encoding: "utf8"},
   );
-  const result = JSON.parse(configText);
+  const parsedConfig = JSON.parse(configText);
+  const defaultConfig = generateInitConfig();
+  const result = {
+    ...defaultConfig,
+    ...parsedConfig
+  }
   return result;
 }

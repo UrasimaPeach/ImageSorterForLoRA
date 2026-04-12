@@ -13,9 +13,11 @@ const { escapeToHtmlText } = require('./util/escape')
 const { base64ImgSrc } = require('./util/imageSrc')
 const {
   ensureTargetDirectory,
-  generateInitConfig,
   outputConig
 } = require('./isfl/editdir')
+const {
+  generateInitStatus
+} = require('./isfl/status')
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -25,38 +27,33 @@ const createWindow = () => {
         preload: path.join(__dirname, 'preload.js'),
     },
   });
-  let selectionIndexOfUI = 0;
-  let undeterminedDirPath = "";
-  let undeterminedImages = [];
-  let targetSpaceList = [];
-  let configJson = generateInitConfig();
+  let isflStatus = generateInitStatus();
   const updateConfigJsonCurrent = () => {
-    console.log("config update on ", undeterminedDirPath)
-    if((!isNaN(undeterminedDirPath)) && undeterminedDirPath.length > 0) {
+    if((!isNaN(isflStatus.undeterminedDirPath)) && isflStatus.undeterminedDirPath.length > 0) {
       outputConfig(
-        undeterminedDirPath,
-        configJson
+        isflStatus.undeterminedDirPath,
+        isflStatus.configJson
       )
     }
   }
   const setSelectionIndexOfUI = (indexAny) => {
     const indexInt = parseInt(indexAny)
     if (!isNaN(indexInt)) {
-      const escapedDirPath = escapeToHtmlText(undeterminedDirPath)
+      const escapedDirPath = escapeToHtmlText(isflStatus.undeterminedDirPath)
       let currentImageName = "";
       let imageHtml = "";
       let tagString = "";
-      if (0 <= indexInt && indexInt < undeterminedImages.length) {
-        selectionIndexOfUI = indexInt;
-        const imageBase64 = base64ImgSrc("png", undeterminedImages[indexInt].imageBase64)
+      if (0 <= indexInt && indexInt < isflStatus.undeterminedImages.length) {
+        isflStatus.selectionIndexOfUI = indexInt;
+        const imageBase64 = base64ImgSrc("png", isflStatus.undeterminedImages[indexInt].imageBase64)
         imageHtml = `
           <img src="${imageBase64}" width="512px" />
         `
-        currentImageName = escapeToHtmlText(undeterminedImages[indexInt].fileName);
-        tagString = escapeToHtmlText(positiveTagsToString(undeterminedImages[indexInt].tagList))
+        currentImageName = escapeToHtmlText(isflStatus.undeterminedImages[indexInt].fileName);
+        tagString = escapeToHtmlText(positiveTagsToString(isflStatus.undeterminedImages[indexInt].tagList))
         console.log(tagString)
       }
-      const lastImageIndex = undeterminedImages.length - 1;
+      const lastImageIndex = isflStatus.undeterminedImages.length - 1;
       let executeScript = `
         document.getElementById('showDirectorySelect').innerText=\`${escapedDirPath}\`;
         document.getElementById('showCurrentImageName').innerText=\`${currentImageName}\`;
@@ -71,7 +68,8 @@ const createWindow = () => {
   const reloadTargetSpaceList = () => {
     let targetSpaceInnerHtml = `<p>select copy target directory</p>`
     targetSpaceInnerHtml = "";
-    targetSpaceList.forEach((targetSpacePath, index) => {
+    console.log("mike")
+    isflStatus.configJson.copyTargetDirectoryResolutionPathList.forEach((targetSpacePath, index) => {
       const escapedPath = escapeToHtmlText(targetSpacePath)
       const targetSpaceButtonAreaHtml = `
         <h3>${escapedPath}</h3>
@@ -83,10 +81,12 @@ const createWindow = () => {
         </button>`;
       targetSpaceInnerHtml = `${targetSpaceInnerHtml}${targetSpaceButtonAreaHtml}`;
     });
+    console.log("AAWM", targetSpaceInnerHtml)
     let executeScript = `
       document.getElementById('copyTargetSpace').innerHTML=\`${targetSpaceInnerHtml}\`;
     `;
-    targetSpaceList.forEach((_value, index) => {
+    console.log("GEKA", executeScript)
+    isflStatus.configJson.copyTargetDirectoryResolutionPathList.forEach((_value, index) => {
       executeScript = `${executeScript}
         document.getElementById('copyToHereButton${index}').addEventListener('click', async() => {
           const imageTagsString = document.getElementById('checkingImageTags').value;
@@ -103,26 +103,27 @@ const createWindow = () => {
           await window.apis.runClickRemoveThisArea(${index});
         })`
     })
+    console.log("KEKO", executeScript)
     win.webContents.executeJavaScript(executeScript);
   }
   ipcMain.handle('click-event-ds', async (_e, _arg) => {
     dialog.showOpenDialog({title: '', properties: ['openDirectory', 'showHiddenFiles']}).then(result => {
       if(!result.canceled) {
-        undeterminedDirPath = result.filePaths[0];
-        configJson = ensureTargetDirectory(undeterminedDirPath);
-        const fileNames = fs.readdirSync(undeterminedDirPath);
+        isflStatus.undeterminedDirPath = result.filePaths[0];
+        isflStatus.configJson = ensureTargetDirectory(isflStatus.undeterminedDirPath);
+        const fileNames = fs.readdirSync(isflStatus.undeterminedDirPath);
         fileNames.sort();
-        undeterminedImages = []
+        isflStatus.undeterminedImages = []
         fileNames.forEach((fileName) => {
-          const filePath = `${undeterminedDirPath}${path.sep}${fileName}`
+          const filePath = `${isflStatus.undeterminedDirPath}${path.sep}${fileName}`
           if (fs.statSync(filePath).isFile()) {
             const imageBuffer = fs.readFileSync(filePath)
             const imageBase64 = imageBuffer.toString('base64')
             const pngInfo = bufferToPngInfo(imageBuffer)
             if (pngInfo !==null) {
               const tagList = pngInfoToPositiveTags(pngInfo)
-              undeterminedImages.push({
-                dirPath: undeterminedDirPath,
+              isflStatus.undeterminedImages.push({
+                dirPath: isflStatus.undeterminedDirPath,
                 fileName,
                 filePath,
                 imageBase64,
@@ -139,7 +140,12 @@ const createWindow = () => {
   ipcMain.handle('click-event-act', async (_e, _arg) => {
     dialog.showOpenDialog({title: '', properties: ['openDirectory', 'showHiddenFiles', 'createDirectory']}).then(result => {
       if(!result.canceled) {
-        targetSpaceList.push(result.filePaths[0]);
+        console.log(JSON.stringify(isflStatus.configJson))
+        console.log(JSON.stringify(isflStatus.configJson["copyTargetDirectoryResolutionPathList"]))
+        console.log(result.filePaths)
+        isflStatus.configJson.copyTargetDirectoryResolutionPathList.push(
+          result.filePaths[0]
+        );
         reloadTargetSpaceList();
       }
     });
@@ -151,8 +157,8 @@ const createWindow = () => {
     removeTagsString,
     extraTagsString
   ) => {
-    const selectionImage = undeterminedImages[selectionIndexOfUI];
-    const targetDirectoryPath = targetSpaceList[targetDirectoryIndex];
+    const selectionImage = isflStatus.undeterminedImages[isflStatus.selectionIndexOfUI];
+    const targetDirectoryPath = isflStatus.configJson.copyTargetDirectoryResolutionPathList[targetDirectoryIndex];
     const targetImageFilePath = path.join(targetDirectoryPath, selectionImage.fileName);
     const targetTagTextPath = `${targetImageFilePath.substring(0, targetImageFilePath.lastIndexOf("."))}.txt`;
     fs.copyFileSync(selectionImage.filePath, targetImageFilePath);
@@ -163,10 +169,11 @@ const createWindow = () => {
     resultTags = resultTags.concat(extraTags)
     const tagText = tagListToTagListString(resultTags);
     fs.writeFileSync(targetTagTextPath, tagText, { encoding: "utf8"});
-    setSelectionIndexOfUI(selectionIndexOfUI+1);
+    setSelectionIndexOfUI(isflStatus.selectionIndexOfUI+1);
+    updateConfigJsonCurrent();
   })
   ipcMain.handle('click-event-rta', async (_e, index) => {
-    targetSpaceList.splice(index, 1)
+    isflStatus.configJson.copyTargetDirectoryResolutionPathList.splice(index, 1)
     reloadTargetSpaceList();
   })
   ipcMain.handle('input-event-cii', async (_e, args) => {

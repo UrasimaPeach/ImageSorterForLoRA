@@ -14,3 +14,22 @@ const textImageIndex = document.getElementById('checkingImageIndex');
 textImageIndex.addEventListener('input', async(e) => {
   await window.apis.runInputCheckingImageIndex({ indexString: e.target.value});
 })
+
+window.electronAPI.fetchRemoveTagsString((setCurrentStatus, preventStatus) => {
+  setCurrentStatus({
+    ...preventStatus,
+
+  })
+  const removeTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
+  removeTagsString;
+})
+
+
+
+
+
+
+
+var getExtraTagsString = () => {
+  const extraTagsString = document.getElementById('sharedExtraTagsOfImage').value;
+}
