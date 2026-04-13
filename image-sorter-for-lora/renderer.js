@@ -1,3 +1,7 @@
+import {
+  tagListStringToTagList
+} from './util/readpng.js'
+
 const btnDirectorySelect = document.getElementById('btnDirectorySelect');
 btnDirectorySelect.addEventListener('click', async() => {
   await window.apis.runClickEventDirectorySelect();
