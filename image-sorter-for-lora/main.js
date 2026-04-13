@@ -28,6 +28,12 @@ const createWindow = () => {
     },
   });
   let isflStatus = generateInitStatus();
+  const updateIsflStatus = (newIsflStatus) => {
+    isflStatus = {
+      ...isflStatus,
+      newIsflStatus
+    }
+  }
   const updateConfigJsonCurrent = () => {
     console.log(isflStatus.undeterminedDirPath)
     console.log(isflStatus.configJson)
@@ -203,6 +209,9 @@ const createWindow = () => {
   })
   ipcMain.handle('click-event-sit', async (_e, args) => {
     updateConfigJsonCurrent();
+  })
+  ipcMain.handle('update-isfl-status', async (_e, newIsflStatus) => {
+    updateIsflStatus(newIsflStatus);
   })
 
   ipcMain.on('close', () => {
