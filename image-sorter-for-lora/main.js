@@ -29,14 +29,18 @@ const createWindow = () => {
   });
   let isflStatus = generateInitStatus();
   const updateIsflStatus = (newIsflStatus) => {
+    console.log("called updateIsflStatus")
+    console.log(newIsflStatus.configJson)
     isflStatus = {
       ...isflStatus,
       newIsflStatus
     }
+    console.log(isflStatus.configJson);
   }
   const updateConfigJsonCurrent = () => {
-    console.log(isflStatus.undeterminedDirPath)
-    console.log(isflStatus.configJson)
+    console.log("fetch start")
+    win.webContents.send('fetch-isfl-status-from-current-input', isflStatus) // TODO sync
+    console.log("fetch end")
     if (
       (isflStatus.undeterminedDirPath != null) &&
       (!isNaN(isflStatus.undeterminedDirPath.length)) &&

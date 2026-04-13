@@ -19,21 +19,15 @@ textImageIndex.addEventListener('input', async(e) => {
   await window.apis.runInputCheckingImageIndex({ indexString: e.target.value});
 })
 
-window.electronAPI.fetchRemoveTagsString((setCurrentStatus, preventStatus) => {
-  setCurrentStatus({
-    ...preventStatus,
-
-  })
+window.apis.fetchIsflStatusFromCurrentInput((currentStatus) => {
+  let newIsflStatus = {
+    ...currentStatus
+  };
   const removeTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
-  removeTagsString;
+  const extraTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
+  const removeTags = tagListStringToTagList(removeTagsString);
+  const extraTags = tagListStringToTagList(extraTagsString);
+  newIsflStatus.configJson.sharedRemoveTagsList = removeTags
+  newIsflStatus.configJson.shareExtraTsgsList = extraTagsString
+  window.apis.updateIsflStatus(newIsflStatus)
 })
-
-
-
-
-
-
-
-var getExtraTagsString = () => {
-  const extraTagsString = document.getElementById('sharedExtraTagsOfImage').value;
-}

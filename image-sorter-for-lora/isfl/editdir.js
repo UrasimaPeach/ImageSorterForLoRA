@@ -5,9 +5,7 @@ const CONFIGFILE_NAME = "isflConfig.json";
 
 export const ensureTargetDirectory = (dirPath) => {
   let result = {}
-  console.log(dirPath)
   const filenames = fs.readdirSync(dirPath)
-  console.log(filenames);
   const configFileName = filenames.find(filename => {
     return filename === CONFIGFILE_NAME
   })
@@ -17,7 +15,6 @@ export const ensureTargetDirectory = (dirPath) => {
     result = generateInitConfig()
     outputConfig(dirPath, result)
   }
-  console.log(result);
   return result
 }
 
