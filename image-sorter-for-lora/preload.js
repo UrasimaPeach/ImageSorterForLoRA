@@ -19,5 +19,10 @@ contextBridge.exposeInMainWorld('apis', {
 	)
   },
   runClickRemoveThisArea: async (index) => ipcRenderer.invoke('click-event-rta', index),
-  runInputCheckingImageIndex: async (indexJson) => ipcRenderer.invoke('input-event-cii', indexJson)
+  runInputCheckingImageIndex: async (indexJson) => ipcRenderer.invoke('input-event-cii', indexJson),
+  updateIsflStatus: async (newIsflStatus) => ipcRenderer.invoke('update-isfl-status', newIsflStatus),
+  fetchIsflStatusFromCurrentInput: (callback) => ipcRenderer.on(
+    'fetch-isfl-status-from-current-input',
+    (_e, currentStatus) => callback(currentStatus)
+  )
 });
