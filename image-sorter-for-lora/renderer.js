@@ -1,33 +1,79 @@
 import {
   tagListStringToTagList
 } from './util/readpng.js'
+import {
+  applyIsflStatus
+} from './isfl/htmllib/applyIsflStatus.js'
+import {
+  getCurrentInputValues
+} from './isfl/htmllib/getCurrentInputValues.js'
 
 const btnDirectorySelect = document.getElementById('btnDirectorySelect');
+const btnSaveInputText = document.getElementById('btnSaveInputText');
+const btnAddCopyTarget = document.getElementById('btnAddCopyTarget');
+const textImageIndex = document.getElementById('checkingImageIndex');
+
 btnDirectorySelect.addEventListener('click', async() => {
   await window.apis.runClickEventDirectorySelect();
+});
+btnSaveInputText.addEventListener('click', async() => {
+  await window.apis.runClickEventSaveInputText();
 })
-const btnUpdateConfig = document.getElementById('btnUpdateConfig');
-btnUpdateConfig.addEventListener('click', async() => {
-  await window.apis.runClickEventUpdateConfig();
-})
-const btnAddCopyTarget = document.getElementById('btnAddCopyTarget');
 btnAddCopyTarget.addEventListener('click', async() => {
-  await window.apis.runClickEventAddCopyTarget();
+  const currentValues = getCurrentInputValues();
+  await window.apis.runClickEventAddCopyTarget(currentValues);
 })
-const textImageIndex = document.getElementById('checkingImageIndex');
 textImageIndex.addEventListener('input', async(e) => {
-  await window.apis.runInputCheckingImageIndex({ indexString: e.target.value});
+  const currentValues = getCurrentInputValues();
+  await window.apis.runInputCheckingImageIndex({ indexString: e.target.value, currentValues});
 })
 
-window.apis.fetchIsflStatusFromCurrentInput((currentStatus) => {
+window.apis.fetchIsflStatusFromCurrentInput((nise) => {
   let newIsflStatus = {
-    ...currentStatus
+    ...nise.isflStatus
   };
-  const removeTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
-  const extraTagsString = document.getElementById('sharedRemoveTagsOfImage').value;
+  const currentValues = getCurrentInputValues();
+  const {
+    imageTagsString,
+    extraTagsString,
+    removeTagsString,
+    selectionIndexOfUI,
+  } = currentValues;
   const removeTags = tagListStringToTagList(removeTagsString);
   const extraTags = tagListStringToTagList(extraTagsString);
-  newIsflStatus.configJson.sharedRemoveTagsList = removeTags
-  newIsflStatus.configJson.shareExtraTsgsList = extraTagsString
-  window.apis.updateIsflStatus(newIsflStatus)
+  let currentIndex = parseInt(selectionIndexOfUI);
+  if (
+    isNaN(currentIndex) ||
+    (!Array.isArray(newIsflStatus.undeterminedImages))
+  ) {
+    currentIndex = 0;
+  } else {
+    if(currentIndex >= newIsflStatus.undeterminedImages) {
+      currentIndex = newIsflStatus.undeterminedImages.length - 1;
+    }
+    if(currentIndex < 0) {
+      currentIndex=0;
+    }
+  }
+  newIsflStatus.selectionIndexOfUI = parseInt(currentIndex);
+  newIsflStatus.imageTagsString = imageTagsString;
+  newIsflStatus.removeTagsString = removeTagsString;
+  newIsflStatus.extraTagsString = extraTagsString;
+  newIsflStatus.configJson.currentShowingImageIndex = parseInt(currentIndex);
+  newIsflStatus.configJson.sharedRemoveTagsList = removeTags;
+  newIsflStatus.configJson.shareExtraTagsList = extraTags;
+  const newNise = {
+    ...nise,
+    isflStatus: newIsflStatus,
+    currentValues: currentValues
+  }
+  window.apis.niseCallback(newNise)
+})
+window.apis.applyIsflStatusToCurrentInput((nise) => {
+  applyIsflStatus(nise.isflStatus);
+  const newNise = {
+    ...nise,
+    currentValues: getCurrentInputValues()
+  }
+  window.apis.niseCallback(newNise)
 })

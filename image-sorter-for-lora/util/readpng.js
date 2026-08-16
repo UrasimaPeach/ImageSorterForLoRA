@@ -151,19 +151,20 @@ export const positiveTagsToString = (positiveTags, removeTags) => {
     }
     return true
   });
-  const result = filteredPositiveTags.join(",\n");
+  const result = tagListToTagListString(filteredPositiveTags);
   return result
 }
 
 export const tagListToTagListString = (tagList) => {
-  return tagList.join(",")
+  return tagList.join(",\n")
 }
 
 export const tagListStringToTagList = (tagListString) => {
   const separatorRegexAfter = /,[ ]+/g
   const separatorRegexBefore = /[ ]+,/g
-  const escapedString = tagListString.replaceAll("\n","").replaceAll(separatorRegexAfter, ",").replaceAll(separatorRegexBefore, ",")
-  return tagListString.split(",")
+  const escapedString = tagListString.replaceAll("\n",",").replaceAll(separatorRegexAfter, ",").replaceAll(separatorRegexBefore, ",")
+  const result = escapedString.split(",").filter(tagName => tagName.length > 0)
+  return result;
 }
 
 export const removeTagList = (tagList, removeTagList) => {
